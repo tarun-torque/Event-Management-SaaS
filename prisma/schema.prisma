@@ -12,3 +12,75 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model attendee {
+  attendeeId     String           @id @default(uuid())
+  name           String
+  email          String
+  password       String
+  location       String
+  role           role             @default(attendee)
+  attendeeEvents attendeeEvents[]
+}
+
+model attendeeEvents {
+  attendeeEventId String    @id @default(uuid())
+  attendee        attendee? @relation(fields: [attendeeId], references: [attendeeId])
+  attendeeId      String?
+  event           event?    @relation(fields: [eventEventId], references: [eventId])
+  eventEventId    String?
+}
+
+model organizer {
+  organizerId      String  @id @default(uuid())
+  profile          String
+  name             String
+  organizationName String
+  email            String
+  phoneNo          String
+  password         String
+  website          String?
+  socialMediaLinks String
+  event            event[]
+  role             role    @default(organizer)
+  isVerified       Boolean @default(false)
+}
+
+model event {
+  eventId              String           @id @default(uuid())
+  name                 String
+  description          String
+  startTime            DateTime
+  endTime              DateTime
+  venue                String
+  banner               String
+  type                 String
+  agenda               String
+  ticketsInfo          TicketsInfo?
+  attendee             attendeeEvents[]
+  organizer            organizer?       @relation(fields: [organizerId], references: [organizerId])
+  organizerId String?
+}
+
+model TicketsInfo {
+  numberOfGeneralTicket String
+  numberOfVipTickets    String
+  deadline              String
+  discountOnEarlyBird   String
+  deadlineEarlyBird     DateTime
+  event                 event    @relation(fields: [eventId], references: [eventId])
+  eventId               String   @unique
+}
+
+enum role {
+  admin
+  attendee
+  organizer
+}
+
+enum ticketType {
+  earlyBird
+  vip
+  general
+  waitlist
+}
