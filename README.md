@@ -1,4 +1,3 @@
-# Saas-Event Management
 # organizer flow 
 1. Register themselves.  
 2. Cannot create an event without approval from the admin.  
