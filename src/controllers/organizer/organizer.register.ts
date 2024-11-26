@@ -1,14 +1,15 @@
 import prisma from "../../DB/db.config";
-import { Request, Response } from "express";
+import { Request, Response } from "express-serve-static-core";
 import { response } from "./types";
 import { registerOrganizer } from "./types";
 import { registerOrganizerValidation } from "../../validations/event.validation";
 import { Password } from "../../utils/password";
+import { orgId } from "./types";
 import {z} from 'zod'
 
 export class organizerRegister {
   static register = async (
-    req:Request,
+    req:Request<{},{},registerOrganizer>,
     res:Response
   ) => {
     const {
@@ -49,4 +50,14 @@ export class organizerRegister {
         }
     }
   };
+
+  static getProfile = async(req:Request<orgId>,Res:Response)=>{
+    const {organizerId} = req.params
+    try {
+        const profile = await prisma.organizer.findUnique({where:{organizerId}})
+    
+    } catch (error) {
+        
+    }
+  }
 }
