@@ -36,10 +36,10 @@ model attendeeEvents {
 
 model organizer {
   organizerId      String  @id @default(uuid())
-  profile          String
+  profile          String?
   name             String
   organizationName String
-  email            String
+  email            String @unique
   phoneNo          String
   password         String
   website          String?
@@ -56,9 +56,10 @@ model event {
   startTime   DateTime
   endTime     DateTime
   venue       String
-  banner      String
+  banner      String?
   type        String
   agenda      String
+  isVerified   Boolean          @default(false)
   ticketsInfo TicketsInfo?
   attendee    attendeeEvents[]
   organizer   organizer?       @relation(fields: [organizerId], references: [organizerId])
@@ -69,10 +70,10 @@ model TicketsInfo {
   numberOfGeneralTicket String
   numberOfVipTickets    String
   deadline              DateTime?
-  discountOnEarlyBird   String
-  deadlineEarlyBird     DateTime
-  event                 event    @relation(fields: [eventId], references: [eventId])
-  eventId               String   @unique
+  discountOnEarlyBird   String?
+  deadlineEarlyBird     DateTime?
+  event                 event     @relation(fields: [eventId], references: [eventId])
+  eventId               String    @unique
 }
 
 enum role {

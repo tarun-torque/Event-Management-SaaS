@@ -1,6 +1,10 @@
 import { Response, Request } from "express";
 import { event, eventId, orgId, response, ticket } from "./types";
 import prisma from "../../DB/db.config";
+import {
+  createEventValidation,
+  ticketInfoValidation,
+} from "../../validations/event.validation";
 
 export class organizer {
   static createEvent = async (
@@ -17,7 +21,7 @@ export class organizer {
       banner,
       type,
       agenda,
-    } = req.body;
+    } = createEventValidation.parse(req.body);
 
     try {
       //save
@@ -52,7 +56,7 @@ export class organizer {
       deadline,
       discountOnEarlyBird,
       deadlineEarlyBird,
-    } = req.body;
+    } = ticketInfoValidation.parse(req.body);
 
     try {
       const save = await prisma.ticketsInfo.create({
@@ -66,7 +70,7 @@ export class organizer {
         },
       });
 
-      res.status(200).json({message:'Ticket info added'})
+      res.status(200).json({ message: "Ticket info added" });
     } catch (error) {
       console.log(error);
     }

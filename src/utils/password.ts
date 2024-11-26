@@ -1,7 +1,6 @@
 import bcrypt from 'bcrypt'
 
 export class Password{
-    
     static hashPassword = async(password:string)=>{
         const salt = bcrypt.genSaltSync(10)
         const hash = bcrypt.hashSync(password,salt)

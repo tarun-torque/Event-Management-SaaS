@@ -1,3 +1,14 @@
+export interface registerOrganizer {
+  name: string;
+  profile?: string;
+  organizationName: string;
+  email: string;
+  phoneNo: string;
+  password: string;
+  website?: string;
+  socialMediaLinks: string;
+}
+
 export interface event {
   eventId: string;
   name: string;
@@ -10,10 +21,13 @@ export interface event {
   agenda: string;
 }
 
-export interface response{
+export interface response {
+  message: string;
+  errors?:{
+    field:string,
     message:string
+  }
 }
-
 
 export interface orgId {
   organizerId: string;
