@@ -16,9 +16,12 @@ datasource db {
 model attendee {
   attendeeId     String           @id @default(uuid())
   name           String
+  profile        String
   email          String
   password       String
-  location       String
+  country        String
+  state          String
+  city           String
   role           role             @default(attendee)
   attendeeEvents attendeeEvents[]
 }
@@ -47,25 +50,25 @@ model organizer {
 }
 
 model event {
-  eventId              String           @id @default(uuid())
-  name                 String
-  description          String
-  startTime            DateTime
-  endTime              DateTime
-  venue                String
-  banner               String
-  type                 String
-  agenda               String
-  ticketsInfo          TicketsInfo?
-  attendee             attendeeEvents[]
-  organizer            organizer?       @relation(fields: [organizerId], references: [organizerId])
+  eventId     String           @id @default(uuid())
+  name        String
+  description String
+  startTime   DateTime
+  endTime     DateTime
+  venue       String
+  banner      String
+  type        String
+  agenda      String
+  ticketsInfo TicketsInfo?
+  attendee    attendeeEvents[]
+  organizer   organizer?       @relation(fields: [organizerId], references: [organizerId])
   organizerId String?
 }
 
 model TicketsInfo {
   numberOfGeneralTicket String
   numberOfVipTickets    String
-  deadline              String
+  deadline              DateTime?
   discountOnEarlyBird   String
   deadlineEarlyBird     DateTime
   event                 event    @relation(fields: [eventId], references: [eventId])

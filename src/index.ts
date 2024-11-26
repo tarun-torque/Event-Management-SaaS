@@ -1,11 +1,19 @@
-import express from 'express'
-import { SwaggerUiOptions } from 'swagger-ui-express'
+import express from "express";
+import prisma from "./DB/db.config";
+import { SwaggerUiOptions } from "swagger-ui-express";
+import router from "./routes/routes";
 
-const app = express()
+const app = express();
+app.use(express.json());
 
-const PORT = 300
+app.use("/api/v1", router);
 
-app.listen(PORT,()=>{
-    console.log('running')
-})
+app.get("/", (req, res) => {
+  res.send("hello");
+});
 
+const PORT = 3000;
+
+app.listen(PORT, () => {
+  console.log("running");
+});
