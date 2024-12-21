@@ -13,25 +13,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model attendee {
-  attendeeId     String           @id @default(uuid())
-  name           String
-  profile        String
-  email          String
-  password       String
-  country        String
-  state          String
-  city           String
-  role           role             @default(attendee)
-  attendeeEvents attendeeEvents[]
-}
-
-model attendeeEvents {
-  attendeeEventId String    @id @default(uuid())
-  attendee        attendee? @relation(fields: [attendeeId], references: [attendeeId])
-  attendeeId      String?
-  event           event?    @relation(fields: [eventEventId], references: [eventId])
-  eventEventId    String?
+model admin {
+  adminId   String  @id @default(uuid())
+  name      String
+  email     String  @unique
+  password  String
+  secretKey String
+  otp       String?
 }
 
 model organizer {
@@ -39,9 +27,10 @@ model organizer {
   profile          String?
   name             String
   organizationName String
-  email            String @unique
+  email            String  @unique
   phoneNo          String
   password         String
+  otp              String?
   website          String?
   socialMediaLinks String
   event            event[]
@@ -50,25 +39,76 @@ model organizer {
 }
 
 model event {
-  eventId     String           @id @default(uuid())
-  name        String
-  description String
-  startTime   DateTime
-  endTime     DateTime
+  eventId       String           @id @default(uuid())
+  startTime     DateTime
+  endTime       DateTime
+  venue         String
+  banner        String?
+  eventType     eventType
+  anniversary   anniversary?
+  wedding       wedding?
+  corporate     corporate?
+  birthday      birthday?
+  housewarming  housewarming?
+  isVerified    Boolean          @default(false)
+  ticketsInfo   TicketsInfo?
+  booking       attendeeEvents[]
+  organizer     organizer?       @relation(fields: [organizerId], references: [organizerId])
+  organizerId   String?
+  anniversaryId String?
+}
+
+model anniversary {
+  id          String  @id @default(uuid())
+  coupleNames String
+  years       String
   venue       String
-  banner      String?
-  type        String
-  agenda      String
-  isVerified   Boolean          @default(false)
-  ticketsInfo TicketsInfo?
-  attendee    attendeeEvents[]
-  organizer   organizer?       @relation(fields: [organizerId], references: [organizerId])
-  organizerId String?
+  specialNote String?
+  event       event   @relation(fields: [eventId], references: [eventId])
+  eventId     String  @unique
+}
+
+model wedding {
+  id          String  @id @default(uuid())
+  coupleNames String
+  theme       String?
+  event       event   @relation(fields: [eventId], references: [eventId])
+  eventId     String  @unique
+}
+
+model corporate {
+  id           String @id @default(uuid())
+  companyName  String
+  eventPurpose String
+  event        event  @relation(fields: [eventId], references: [eventId])
+  eventId      String @unique
+}
+
+model birthday {
+  id                 String  @id @default(uuid())
+  birthdayPersonName String
+  age                String
+  theme              String
+  specialNote        String?
+  event              event   @relation(fields: [eventId], references: [eventId])
+  eventId            String  @unique
+}
+
+model housewarming {
+  id             String @id @default(uuid())
+  hostName       String
+  description    String
+  specialRituals String
+  event          event  @relation(fields: [eventId], references: [eventId])
+  eventId        String @unique
 }
 
 model TicketsInfo {
   numberOfGeneralTicket String
   numberOfVipTickets    String
+  priceVipTicket        String
+  priceGeneralTicket    String
+  priceEarlyBird        String
   deadline              DateTime?
   discountOnEarlyBird   String?
   deadlineEarlyBird     DateTime?
@@ -76,10 +116,43 @@ model TicketsInfo {
   eventId               String    @unique
 }
 
+model attendee {
+  attendeeId     String           @id @default(uuid())
+  name           String
+  profile        String
+  email          String
+  password       String
+  otp            String?
+  country        String
+  state          String
+  city           String
+  role           role             @default(attendee)
+  attendeeEvents attendeeEvents[]
+}
+
+model attendeeEvents {
+  id            String     @id @default(uuid())
+  eventId       String
+  attendeeId    String
+  bookingDate   DateTime   @default(now())
+  ticketType    ticketType
+  paymentStatus Boolean    @default(false)
+  event         event      @relation(fields: [eventId], references: [eventId])
+  attendee      attendee   @relation(fields: [attendeeId], references: [attendeeId])
+}
+
 enum role {
   admin
   attendee
   organizer
+}
+
+enum eventType {
+  wedding
+  corporateEvent
+  birthdayParties
+  anniversary
+  housewarmingFunction
 }
 
 enum ticketType {
