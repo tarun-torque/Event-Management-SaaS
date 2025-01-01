@@ -5,13 +5,14 @@ export interface registerOrganizer {
   email: string;
   phoneNo: string;
   password: string;
+  ownerDeviceId: string;
   website?: string;
   socialMediaLinks: string;
 }
 
 export interface event {
   eventId: string;
-  name: string;
+  // name: string;
   description: string;
   startTime: string;
   endTime: string;
@@ -23,10 +24,10 @@ export interface event {
 
 export interface response {
   message: string;
-  errors?:{
-    field:string,
-    message:string
-  }
+  errors?: {
+    field: string;
+    message: string;
+  };
 }
 
 export interface orgId {

@@ -7,13 +7,14 @@ import { Password } from "../../utils/password";
 import { orgId } from "./types";
 import { token } from "../../utils/token";
 import { generateDeviceId } from "../../utils/others";
-import {z} from 'zod'
+import { z } from "zod";
+import { JwtPayload } from "jsonwebtoken";
 
 export class organizerRegister {
   static register = async (
-    req:Request<{},{},registerOrganizer>,
-    res:Response
-  ) => {
+    req: Request<{}, {}, registerOrganizer>,
+    res: Response
+  ): Promise<any> => {
     const {
       name,
       profile,
@@ -23,10 +24,10 @@ export class organizerRegister {
       website,
       socialMediaLinks,
       password,
-    } = registerOrganizerValidation.parse(req.body);
+    } = req.body;
     try {
       const hash = await Password.hashPassword(password);
-      const deviceId = generateDeviceId()
+      const deviceId = generateDeviceId();
       const save = await prisma.organizer.create({
         data: {
           name,
@@ -34,106 +35,134 @@ export class organizerRegister {
           organizationName,
           email,
           phoneNo,
-          ownerDeviceId:deviceId,
+          ownerDeviceId: deviceId,
           website,
           socialMediaLinks,
-          password,
+          password: hash,
         },
       });
 
-      res.status(200).json({ message: "Account created Successfully" });
+      res
+        .status(200)
+        .json({ message: "Account created Successfully", deviceId });
     } catch (error) {
-        if (error instanceof z.ZodError) {
-            return res.status(400).json({
-              message: "Validation error",
-              errors: error.errors.map((err) => ({
-                field: err.path[0],
-                message: err.message,
-              })),
-            });
-        }
+      res.status(500).json({ msg: "Something went wrong" });
     }
   };
 
-
-  static login = async(req:Request,res:Response)=>{
-    const {email,password} = req.body
+  static login = async (req: Request, res: Response): Promise<any> => {
+    const { email, password } = req.body;
     try {
-      const isEmail = await prisma.organizer.findUnique({where:{email}})
-      if(isEmail !=email){
-        return res.status(400).json({msg:'Invalid Credentials'})
+      const isEmail = await prisma.organizer.findUnique({ where: { email } });
+      if (isEmail?.email != email) {
+        return res.status(400).json({ msg: "Invalid Credentials" });
       }
 
-      if(isEmail){
-        const isPassword = await Password.comparePassword(password,isEmail.password)
+      if (isEmail) {
+        const isPassword = await Password.comparePassword(
+          password,
+          isEmail?.password
+        );
 
-      if(!isPassword){
-        return res.status(400).json({msg:'Invalid Credentials'})
-      }
-      }
-
-
-      // check plan
-      const maxDevice = 2
-      // check number of device and apply condition according to the plan
-      const loggedInDevice = isEmail?.loggedInDevices.length 
-
-      if(loggedInDevice){
-        if(loggedInDevice<maxDevice){
-          const refreshToken = token.refreshToken({isEmail})
-          const deviceId = generateDeviceId()
-            // if pass condition , add another device id in array
-            const addDeviceId = await prisma.organizer.update({
-              where:{
-                email
-              },
-              data:{
-                loggedInDevices:{
-                  push:deviceId
-                }
-              }
-            })
-
-
-
-          res.cookie('refreshToken',refreshToken)
-          res.status(200).json({msg:'Logged in successfully'})
-          
-
-
+        if (!isPassword) {
+          return res.status(400).json({ msg: "Invalid Credentials" });
         }
       }
 
-      
+      // check plan
+      const maxDevice = 2;
+      // check number of device and apply condition according to the plan
+      const loggedInDevice = isEmail?.loggedInDevices.length;
 
+      // if number of logged in device less than max device
+      if (loggedInDevice != undefined && loggedInDevice < maxDevice) {
+        const refreshToken = token.refreshToken({ isEmail });
+        const deviceId = generateDeviceId();
 
+        const addDeviceId = await prisma.organizer.update({
+          where: {
+            email,
+          },
+          data: {
+            loggedInDevices: {
+              push: deviceId,
+            },
+          },
+        });
 
+        res.cookie("refreshToken", refreshToken);
+        res.status(200).json({ msg: "Logged in successfully" });
+      }
 
-    
+      //if number of logged in device equal to the number of maximum device
+      if (loggedInDevice == maxDevice) {
+        res
+          .status(400)
+          .json({ msg: "Device limit full please upgrade your plan" });
+      }
     } catch (error) {
-      res.status(500).json({msg:'Something went wrong'})
+      res.status(500).json({ msg: "Something went wrong" });
     }
-  }
+  };
 
-
-  static getProfile = async(req:Request<orgId>,Res:Response)=>{
-    const {organizerId} = req.params
+  static logout = async (req: Request, res: Response): Promise<any> => {
     try {
-        const profile = await prisma.organizer.findUnique({where:{organizerId}})
-    
-    } catch (error) {
-        
-    }
-  }
+      const refreshToken = req.cookies["refreshToken"];
+      const decodedToken = token.decodeToken(refreshToken) as JwtPayload;
+      const orgId = decodedToken.isEmail.organizerId;
+      const deviceIdToRemove = decodedToken.isEmail.loggedInDevices[0];
 
-  static getAllOrganizer  = async(req:Request,res:Response)=>{
+      const organizer = await prisma.organizer.findUnique({
+        where: {
+          organizerId: orgId,
+        },
+      });
+
+      if (!organizer) {
+        return console.log("Organizer not found");
+      }
+
+      if (!orgId) {
+        return;
+      }
+      // remove deviceId from logged in device array
+      const updatedOrganizer = await prisma.organizer.update({
+        where: {
+          organizerId: orgId,
+        },
+        data: {
+          loggedInDevices: {
+            set: organizer.loggedInDevices.filter(
+              (deviceId) => deviceId !== deviceIdToRemove
+            ),
+          },
+        },
+      });
+
+      // clear cookie
+      res.clearCookie("refreshToken");
+
+      res.status(200).json({ msg: "Logged out successfully" });
+    } catch (error) {
+      res.status(500).json({ msg: "Something went wrong" });
+    }
+  };
+
+  static getProfile = async (req: Request<orgId>, Res: Response) => {
+    const { organizerId } = req.params;
     try {
-      const allOrganizer = await prisma.organizer.findMany()
-      res.status(200).json({allOrganizer})
-      
-    } catch (error) {
-      res.status(500).json("Something went wrong")
-    }
-  }
+      const profile = await prisma.organizer.findUnique({
+        where: { organizerId },
+      });
+    } catch (error) {}
+  };
 
+  static getAllOrganizer = async (req: Request, res: Response) => {
+    try {
+      const allOrganizer = await prisma.organizer.findMany();
+      res.status(200).json({ allOrganizer });
+    } catch (error) {
+      res.status(500).json("Something went wrong");
+    }
+  };
 }

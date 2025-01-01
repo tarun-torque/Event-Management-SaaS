@@ -1,78 +1,78 @@
-import { Response, Request } from "express";
-import { event, eventId, orgId, response, ticket } from "./types";
-import prisma from "../../DB/db.config";
-import {
-  createEventValidation,
-  ticketInfoValidation,
-} from "../../validations/event.validation";
+// import { Response, Request } from "express";
+// import { event, eventId, orgId, response, ticket } from "./types";
+// import prisma from "../../DB/db.config";
+// import {
+//   createEventValidation,
+//   ticketInfoValidation,
+// } from "../../validations/event.validation";
 
-export class organizer {
-  static createEvent = async (
-    req: Request<orgId, {}, event>,
-    res: Response
-  ) => {
-    const { organizerId } = req.params;
-    const {
-      name,
-      description,
-      startTime,
-      endTime,
-      venue,
-      banner,
-      type,
-      agenda,
-    } = createEventValidation.parse(req.body);
+// export class organizer {
+//   static createEvent = async (
+//     req: Request<orgId, {}, event>,
+//     res: Response
+//   ) => {
+//     const { organizerId } = req.params;
+//     const {
+//       // name,
+//       description,
+//       startTime,
+//       endTime,
+//       venue,
+//       banner,
+//       type,
+//       agenda,
+//     } = createEventValidation.parse(req.body);
 
-    try {
-      //save
-      const save = await prisma.event.create({
-        data: {
-          organizerId,
-          name,
-          description,
-          startTime,
-          endTime,
-          venue,
-          banner,
-          type,
-          agenda,
-        },
-      });
+//     try {
+//       //save
+//       const save = await prisma.event.create({
+//         data: {
+//           organizerId,
+//           // name,
+//           description,
+//           startTime,
+//           endTime,
+//           venue,
+//           banner,
+//           type,
+//           agenda,
+//         },
+//       });
 
-      res.status(200).json({ msg: "Event created Successfully" });
-    } catch (error) {
-      console.log(error);
-    }
-  };
+//       res.status(200).json({ msg: "Event created Successfully" });
+//     } catch (error) {
+//       console.log(error);
+//     }
+//   };
 
-  static ticketInfo = async (
-    req: Request<eventId, {}, ticket>,
-    res: Response<response>
-  ) => {
-    const { eventId } = req.params;
-    const {
-      numberOfGeneralTicket,
-      numberOfVipTickets,
-      deadline,
-      discountOnEarlyBird,
-      deadlineEarlyBird,
-    } = ticketInfoValidation.parse(req.body);
+//   static ticketInfo = async (
+//     req: Request<eventId, {}, ticket>,
+//     res: Response<response>
+//   ) => {
+//     const { eventId } = req.params;
+//     const {
+//       numberOfGeneralTicket,
+//       numberOfVipTickets,
+//       deadline,
+//       discountOnEarlyBird,
+//       deadlineEarlyBird,
+//     } = ticketInfoValidation.parse(req.body);
 
-    try {
-      const save = await prisma.ticketsInfo.create({
-        data: {
-          eventId,
-          numberOfGeneralTicket,
-          numberOfVipTickets,
-          deadline,
-          discountOnEarlyBird,
-          deadlineEarlyBird,
-        },
-      });
+//     try {
+//       const save = await prisma.ticketsInfo.create({
+//         data: {
+//           eventId,
+//           numberOfGeneralTicket,
+//           numberOfVipTickets,
+//           deadline,
+//           discountOnEarlyBird,
+//           deadlineEarlyBird,
+//         },
+//       });
 
-      res.status(200).json({ message: "Ticket info added" });
-    } catch (error) {
-      console.log(error);
-    }
-  };
-}
+//       res.status(200).json({ message: "Ticket info added" });
+//     } catch (error) {
+//       console.log(error);
+//     }
+//   };
+// }
