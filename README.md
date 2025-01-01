@@ -5,25 +5,30 @@
 3. Create an event with fields such as event name, start date, end date, and add custom fields as needed.
 4. Define the number and types of tickets, such as General and VIP, along with deadlines and early bird time limits.
 
-
 There are four plans :
 Free tier :1 event/month,attendee-50 <br/>
 Starter : 5 event/ month,attendee-200 <br/>
 Pro: 20 event/month,attendee-1000 <br/>
 Enterprise : unlimited,attendee-unlimited <br/>
 
-
-On-site Check-in : Not Available	QR Code Only	QR Code + Name Search	Advanced Tools
+On-site Check-in : Not Available QR Code Only QR Code + Name Search Advanced Tools
 
 3 options
 
-Demographic Data	Basic Age and Gender Info	Age, Gender, and Location	Full Demographics (Occupation, Interests)	In-depth Custom Fields (e.g., Behavior, Previous Events)
+Demographic Data Basic Age and Gender Info Age, Gender, and Location Full Demographics (Occupation, Interests) In-depth Custom Fields (e.g., Behavior, Previous Events)
 
-
-factors : 
+factors :
 1.event limit
 2.attendee limit
 3.check in
 4.age and gender of attendee
 5.Ticket Resale Insights
 6.extra fields of event like testimonials pictures
+
+<!-- progress
+
+1. organizer register
+2.only owner can only change the password
+2.initialy free plan
+3. purchase plan according to that max device limit implement
+only master device can change the password -->

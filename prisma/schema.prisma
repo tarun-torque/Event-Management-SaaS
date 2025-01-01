@@ -23,19 +23,22 @@ model admin {
 }
 
 model organizer {
-  organizerId      String  @id @default(uuid())
+  organizerId      String   @id @default(uuid())
   profile          String?
   name             String
   organizationName String
-  email            String  @unique
+  email            String   @unique
   phoneNo          String
   password         String
   otp              String?
   website          String?
   socialMediaLinks String
+  plan             plan     @default(free)
+  ownerDeviceId    String @default("none")
+  loggedInDevices  String[]
   event            event[]
-  role             role    @default(organizer)
-  isVerified       Boolean @default(false)
+  role             role     @default(organizer)
+  isVerified       Boolean  @default(false)
 }
 
 model event {
@@ -160,4 +163,11 @@ enum ticketType {
   vip
   general
   waitlist
+}
+
+enum plan {
+  free
+  starter
+  pro
+  enterprise
 }
