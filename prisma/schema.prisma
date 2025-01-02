@@ -58,7 +58,7 @@ model event {
   ticketsInfo   TicketsInfo?
   booking       attendeeEvents[]
   organizer     organizer?       @relation(fields: [organizerId], references: [organizerId])
-  organizerId   String?
+  organizerId   String
   anniversaryId String?
 }
 
