@@ -41,6 +41,7 @@ model organizer {
   isVerified       Boolean  @default(false)
 }
 
+
 model event {
   eventId       String           @id @default(uuid())
   startTime     DateTime

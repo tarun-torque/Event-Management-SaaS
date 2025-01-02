@@ -42,6 +42,9 @@ export class organizerRegister {
         },
       });
 
+      // store the device id to the account owner
+      res.cookie('deviceId',deviceId)
+
       res
         .status(200)
         .json({ message: "Account created Successfully", deviceId });
@@ -147,6 +150,27 @@ export class organizerRegister {
       res.status(500).json({ msg: "Something went wrong" });
     }
   };
+
+
+  static sendOtpToResetPassword = async(req:Request,res:Response):Promise<any>=>{
+
+    try {
+      const deviceId = req.cookies["deviceId"]
+      const email = req.body.email
+
+      const profile = await prisma.organizer.findUnique({where:{email}})
+      const realDeviceId = profile?.ownerDeviceId
+      if(deviceId != realDeviceId){
+        return res.status(403).json({msg:"You are not allowed to change the password"})
+      }
+
+      
+    } catch (error) {
+      
+    }
+
+
+  }
 
   static getProfile = async (req: Request<orgId>, Res: Response) => {
     const { organizerId } = req.params;
